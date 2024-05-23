@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+@layer components {
+    #check-existance-btn.inactive {
+        @apply bg-gray-500 cursor-default;
+    }
+}

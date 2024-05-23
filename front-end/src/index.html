@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Check existance of URL</title>
+
+    <script
+      src="https://kit.fontawesome.com/8a53f4c189.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="../dist/format-validator.js" type="text/javascript"></script>
+    <script src="../dist/handler.js" type="text/javascript"></script>
+
+    <link rel="stylesheet" href="../dist/tailwind.css" />
+  </head>
+  <body class="" onload="onready()">
+    <section
+      class="user-area text-center flex flex-col h-[50vh] justify-center items-center"
+    >
+      <h2 class="text-6xl text-emerald-800 mb-12">
+        Please enter url to check for existance
+      </h2>
+
+      <input
+        class="h-24 md:w-[700px] xl:w-[900px] text-3xl border-0 border-b-2 border-b-emerald-800 outline-none pl-5 pr-5"
+        id="user-input-url"
+        name="user-input-url"
+        type="url"
+        placeholder="URL"
+      />
+
+      <div class="p-4 bg-green-700 mt-7 mb-7 border-2 text-2xl cursor-pointer text-white inactive" id="check-existance-btn">check existence</div>
+    </section>
+
+    <section class="program-area flex justify-center">
+      <div
+        class="url-format-result bg-emerald-600 p-10 text-white text-xl min-w-[400px]"
+      >
+        <ul>
+          <li
+            class="show-ok bg-green-600 text-white p-3 text-center mt-4 mb-4 rounded-xl hidden"
+          ></li>
+          <li
+            class="show-error bg-red-600 text-white p-3 text-center mt-4 mb-4 rounded-xl hidden"
+          ></li>
+          <li
+            class="show-warning bg-yellow-600 text-white p-3 text-center mt-4 mb-4 rounded-xl hidden"
+          >
+            SOme warning
+          </li>
+          <li class="item schema">
+            <i class="icon ideal fa-regular fa-circle text-white"></i>
+            <i
+              class="icon ok fa-solid fa-circle-check text-green-400 hidden"
+            ></i>
+            <i
+              class="icon error fa-solid fa-circle-xmark text-red-600 hidden"
+            ></i>
+            <i
+              class="icon warning fa-solid fa-circle-exclamation text-yellow-400 hidden"
+            ></i>
+            <span class="label">URL schema is empty</span>
+          </li>
+          <li class="item domain">
+            <i class="icon ideal fa-regular fa-circle text-white"></i>
+            <i
+              class="icon ok fa-solid fa-circle-check text-green-400 hidden"
+            ></i>
+            <i
+              class="icon error fa-solid fa-circle-xmark text-red-600 hidden"
+            ></i>
+            <i
+              class="icon warning fa-solid fa-circle-exclamation text-yellow-400 hidden"
+            ></i>
+            <span class="label">Domain is empty</span>
+          </li>
+          <li class="item port">
+            <i class="icon ideal fa-regular fa-circle text-white"></i>
+            <i
+              class="icon ok fa-solid fa-circle-check text-green-400 hidden"
+            ></i>
+            <i
+              class="icon error fa-solid fa-circle-xmark text-red-600 hidden"
+            ></i>
+            <i
+              class="icon warning fa-solid fa-circle-exclamation text-yellow-400 hidden"
+            ></i>
+            <span class="label">Port is empty</span>
+          </li>
+          <li class="item path">
+            <i class="icon ideal fa-regular fa-circle text-white"></i>
+            <i
+              class="icon ok fa-solid fa-circle-check text-green-400 hidden"
+            ></i>
+            <i
+              class="icon error fa-solid fa-circle-xmark text-red-600 hidden"
+            ></i>
+            <i
+              class="icon warning fa-solid fa-circle-exclamation text-yellow-400 hidden"
+            ></i>
+            <span class="label">Paths are empty</span>
+          </li>
+          <li class="item queries">
+            <i class="icon ideal fa-regular fa-circle text-white"></i>
+            <i
+              class="icon ok fa-solid fa-circle-check text-green-400 hidden"
+            ></i>
+            <i
+              class="icon error fa-solid fa-circle-xmark text-red-600 hidden"
+            ></i>
+            <i
+              class="icon warning fa-solid fa-circle-exclamation text-yellow-400 hidden"
+            ></i>
+            <span class="label">Queries are empty</span>
+          </li>
+          <li class="item fragment">
+            <i class="icon ideal fa-regular fa-circle text-white"></i>
+            <i
+              class="icon ok fa-solid fa-circle-check text-green-400 hidden"
+            ></i>
+            <i
+              class="icon error fa-solid fa-circle-xmark text-red-600 hidden"
+            ></i>
+            <i
+              class="icon warning fa-solid fa-circle-exclamation text-yellow-400 hidden"
+            ></i>
+            <span class="label">Fragment is empty</span>
+          </li>
+
+          <!-- Should we support for in-url authentication?-->
+        </ul>
+      </div>
+    </section>
+  </body>
+</html>
