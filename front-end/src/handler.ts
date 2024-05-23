@@ -39,9 +39,9 @@ function onready() {
     // register for check existence button click
     check_url_btn.addEventListener('click', async (e) => {
         if (e) {
-            let inputStr = url_input_box.value;    
+            let inputStr = url_input_box.value;
             urlInputChanged(inputStr);
-        
+
             if (!check_url_btn.classList.contains('inactive')) {
                 await checkIfUrlExists(inputStr);
             }
@@ -131,21 +131,33 @@ function urlInputChanged(inputStr: String) {
 }
 
 async function checkIfUrlExists(url: String) {
-    let [exists, status] = await WebCallStatus(url.trim());
+    // while we make server call,
+    // let's lock the input
+    url_input_box.disabled = true;
+    show_ok.textContent = "Calling server for url check...";
 
-    // hide all items
-    [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(item => {
-        item.classList.add('hidden');
+    WebCallStatus(url.trim()).then(r => {
+        // release the input once this resolved
+        url_input_box.disabled = false;
+
+        let [exists, status] = r;
+
+        // hide all items
+        [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(item => {
+            item.classList.add('hidden');
+        });
+
+
+        if (exists) {
+            show_ok.classList.remove('hidden');
+            show_ok.textContent = `Url "${url}" exists. Server returned code ${status}`;
+        } else {
+            show_error.classList.remove('hidden');
+            show_error.textContent = `Url "${url}" does not exists. Server returned code ${status}`;
+        }
     });
 
 
-    if (exists) {
-        show_ok.classList.remove('hidden');
-        show_ok.textContent = `Url "${url}" exists. Server returned code ${status}`;
-    } else {
-        show_error.classList.remove('hidden');
-        show_error.textContent = `Url "${url}" does not exists. Server returned code ${status}`;
-    }
 }
 
 

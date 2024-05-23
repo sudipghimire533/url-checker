@@ -157,26 +157,36 @@ function urlInputChanged(inputStr) {
         });
     }
 }
+var sleep = function (ms) { return new Promise(function (r) { return setTimeout(r, ms); }); };
 function checkIfUrlExists(url) {
     return __awaiter(this, void 0, void 0, function () {
-        var _a, exists, status;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
-                case 0: return [4 /*yield*/, WebCallStatus(url.trim())];
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    // while we make server call,
+                    // let's lock the input
+                    url_input_box.disabled = true;
+                    show_ok.textContent = "Calling server for url check...";
+                    return [4 /*yield*/, sleep(10000)];
                 case 1:
-                    _a = _b.sent(), exists = _a[0], status = _a[1];
-                    // hide all items
-                    [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(function (item) {
-                        item.classList.add('hidden');
+                    _a.sent();
+                    WebCallStatus(url.trim()).then(function (r) {
+                        // release the input once this resolved
+                        url_input_box.disabled = false;
+                        var exists = r[0], status = r[1];
+                        // hide all items
+                        [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(function (item) {
+                            item.classList.add('hidden');
+                        });
+                        if (exists) {
+                            show_ok.classList.remove('hidden');
+                            show_ok.textContent = "Url \"".concat(url, "\" exists. Server returned code ").concat(status);
+                        }
+                        else {
+                            show_error.classList.remove('hidden');
+                            show_error.textContent = "Url \"".concat(url, "\" does not exists. Server returned code ").concat(status);
+                        }
                     });
-                    if (exists) {
-                        show_ok.classList.remove('hidden');
-                        show_ok.textContent = "Url \"".concat(url, "\" exists. Server returned code ").concat(status);
-                    }
-                    else {
-                        show_error.classList.remove('hidden');
-                        show_error.textContent = "Url \"".concat(url, "\" does not exists. Server returned code ").concat(status);
-                    }
                     return [2 /*return*/];
             }
         });

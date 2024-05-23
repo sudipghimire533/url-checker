@@ -1,2 +1,2 @@
-front-end/src/format-validator.js
-front-end/src/handler.js
+front-end/dist/format-validator.js
+front-end/dist/handler.js
