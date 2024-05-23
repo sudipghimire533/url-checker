@@ -34,6 +34,21 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var DestType;
+(function (DestType) {
+    DestType[DestType["Unknown"] = 0] = "Unknown";
+    DestType[DestType["File"] = 1] = "File";
+    DestType[DestType["Folder"] = 2] = "Folder";
+    DestType[DestType["Dynamic"] = 3] = "Dynamic";
+})(DestType || (DestType = {}));
+var ServerResponse = /** @class */ (function () {
+    function ServerResponse() {
+        this.exists = false;
+        this.status = 999;
+        this.type = DestType.Unknown;
+    }
+    return ServerResponse;
+}());
 var item_schema;
 var item_domain;
 var item_port;
@@ -157,67 +172,43 @@ function urlInputChanged(inputStr) {
         });
     }
 }
-var sleep = function (ms) { return new Promise(function (r) { return setTimeout(r, ms); }); };
 function checkIfUrlExists(url) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    // while we make server call,
-                    // let's lock the input
-                    url_input_box.disabled = true;
-                    show_ok.textContent = "Calling server for url check...";
-                    return [4 /*yield*/, sleep(10000)];
-                case 1:
-                    _a.sent();
-                    WebCallStatus(url.trim()).then(function (r) {
-                        // release the input once this resolved
-                        url_input_box.disabled = false;
-                        var exists = r[0], status = r[1];
-                        // hide all items
-                        [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(function (item) {
-                            item.classList.add('hidden');
-                        });
-                        if (exists) {
-                            show_ok.classList.remove('hidden');
-                            show_ok.textContent = "Url \"".concat(url, "\" exists. Server returned code ").concat(status);
-                        }
-                        else {
-                            show_error.classList.remove('hidden');
-                            show_error.textContent = "Url \"".concat(url, "\" does not exists. Server returned code ").concat(status);
-                        }
-                    });
-                    return [2 /*return*/];
-            }
+            // while we make server call,
+            // let's lock the input
+            url_input_box.disabled = true;
+            show_ok.textContent = "Calling server for url check...";
+            WebCallStatus(url.trim()).then(function (response) {
+                // release the input once this resolved
+                url_input_box.disabled = false;
+                // hide all items
+                [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(function (item) {
+                    item.classList.add('hidden');
+                });
+                if (response.exists) {
+                    show_ok.classList.remove('hidden');
+                    show_ok.textContent = "Url \"".concat(url, "\" exists as ").concat(response.type, " type. Server returned code ").concat(status);
+                }
+                else {
+                    show_error.classList.remove('hidden');
+                    show_error.textContent = "Url \"".concat(url, "\" does not exists. Server returned code ").concat(status);
+                }
+            });
+            return [2 /*return*/];
         });
     });
 }
 // Actual web call to url if this exists
-// as per requirement this is not required, but implemented for reference
 function WebCallStatus(url) {
     return __awaiter(this, void 0, void 0, function () {
-        var response, error_1;
+        var response;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [2 /*return*/, [true, 200]];
-                case 1:
-                    _a.trys.push([1, 3, , 4]);
-                    return [4 /*yield*/, fetch(url)];
-                case 2:
-                    response = _a.sent();
-                    if (response.ok) { // Check for successful response (200-299)
-                        return [2 /*return*/, [true, response.status]];
-                    }
-                    else {
-                        return [2 /*return*/, [false, response.status]];
-                    }
-                    return [3 /*break*/, 4];
-                case 3:
-                    error_1 = _a.sent();
-                    console.error("Error fetching URL:", error_1);
-                    return [2 /*return*/, [false, 999]]; // Or any error code to indicate failure
-                case 4: return [2 /*return*/];
-            }
+            response = new ServerResponse;
+            response.exists = true;
+            response.status = 200;
+            response.type = DestType.File;
+            return [2 /*return*/, response];
         });
     });
 }

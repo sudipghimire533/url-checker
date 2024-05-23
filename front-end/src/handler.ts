@@ -1,3 +1,16 @@
+enum DestType {
+    Unknown,
+    File,
+    Folder,
+    Dynamic,
+}
+
+class ServerResponse {
+    exists: boolean = false;
+    status: number = 999;
+    type: DestType = DestType.Unknown;
+}
+
 let item_schema: HTMLElement;
 let item_domain: HTMLElement;
 let item_port: HTMLElement;
@@ -136,11 +149,9 @@ async function checkIfUrlExists(url: String) {
     url_input_box.disabled = true;
     show_ok.textContent = "Calling server for url check...";
 
-    WebCallStatus(url.trim()).then(r => {
+    WebCallStatus(url.trim()).then(response => {
         // release the input once this resolved
         url_input_box.disabled = false;
-
-        let [exists, status] = r;
 
         // hide all items
         [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(item => {
@@ -148,9 +159,9 @@ async function checkIfUrlExists(url: String) {
         });
 
 
-        if (exists) {
+        if (response.exists) {
             show_ok.classList.remove('hidden');
-            show_ok.textContent = `Url "${url}" exists. Server returned code ${status}`;
+            show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${status}`;
         } else {
             show_error.classList.remove('hidden');
             show_error.textContent = `Url "${url}" does not exists. Server returned code ${status}`;
@@ -162,20 +173,10 @@ async function checkIfUrlExists(url: String) {
 
 
 // Actual web call to url if this exists
-// as per requirement this is not required, but implemented for reference
-async function WebCallStatus(url: string): Promise<[boolean, number]> {
-    return [true, 200];
-
-    // Will return in CORS denial
-    try {
-        const response = await fetch(url);
-        if (response.ok) { // Check for successful response (200-299)
-            return [true, response.status];
-        } else {
-            return [false, response.status];
-        }
-    } catch (error) {
-        console.error("Error fetching URL:", error);
-        return [false, 999]; // Or any error code to indicate failure
-    }
+async function WebCallStatus(url: string): Promise<ServerResponse> {
+    let response = new ServerResponse;
+    response.exists = true;
+    response.status = 200;
+    response.type = DestType.File;
+    return response;
 }
