@@ -1,8 +1,8 @@
 enum DestType {
-    Unknown,
-    File,
-    Folder,
-    Dynamic,
+    Unknown = "Unknown",
+    File = "File",
+    Folder = "Folder",
+    Dynamic = "Dynamic",
 }
 
 class ServerResponse {

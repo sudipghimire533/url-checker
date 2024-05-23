@@ -36,10 +36,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var DestType;
 (function (DestType) {
-    DestType[DestType["Unknown"] = 0] = "Unknown";
-    DestType[DestType["File"] = 1] = "File";
-    DestType[DestType["Folder"] = 2] = "Folder";
-    DestType[DestType["Dynamic"] = 3] = "Dynamic";
+    DestType["Unknown"] = "Unknown";
+    DestType["File"] = "File";
+    DestType["Folder"] = "Folder";
+    DestType["Dynamic"] = "Dynamic";
 })(DestType || (DestType = {}));
 var ServerResponse = /** @class */ (function () {
     function ServerResponse() {
