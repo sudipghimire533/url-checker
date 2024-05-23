@@ -49,7 +49,9 @@ function onready() {
         if (e) {
             let inputStr = url_input_box.value;
             urlInputChanged(inputStr);
-            await checkIfUrlExists(inputStr);
+            if (!check_url_btn.classList.contains('inactive')) {
+                await checkIfUrlExists(inputStr);
+            }
         }
     });
 
@@ -159,7 +161,7 @@ async function checkIfUrlExists(url: String) {
         WebCallStatus(url.trim()).then(response => {
 
             // hide all items
-            [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(item => {
+            [show_ok, show_error, show_warning].forEach(item => {
                 item.classList.add('hidden');
             });
 
