@@ -23,6 +23,9 @@ let show_ok: HTMLElement;
 let url_input_box: HTMLInputElement;
 let check_url_btn: HTMLElement;
 
+// A timeout to enable throttle
+let server_call_timeout: ReturnType<typeof setTimeout>;
+
 function fill_items() {
     item_schema = document.querySelector(".program-area li.item.schema")!;
     item_domain = document.querySelector(".program-area li.item.domain")!;
@@ -42,10 +45,11 @@ function onready() {
     check_url_btn = document.querySelector("#check-existance-btn")!;
 
     // register for validator in every input value change
-    url_input_box.addEventListener('input', (e) => {
+    url_input_box.addEventListener('input', async (e) => {
         if (e) {
             let inputStr = url_input_box.value;
             urlInputChanged(inputStr);
+            await checkIfUrlExists(inputStr);
         }
     });
 
@@ -146,31 +150,33 @@ function urlInputChanged(inputStr: String) {
 async function checkIfUrlExists(url: String) {
     // while we make server call,
     // let's lock the input
-    url_input_box.disabled = true;
-    show_ok.textContent = "Calling server for url check...";
 
-    WebCallStatus(url.trim()).then(response => {
-        // release the input once this resolved
-        url_input_box.disabled = false;
+    if (server_call_timeout ) {
+        clearTimeout(server_call_timeout);
+    }
 
-        // hide all items
-        [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(item => {
-            item.classList.add('hidden');
-        });
+    server_call_timeout = setTimeout(async () => {
+        WebCallStatus(url.trim()).then(response => {
 
-        if (response instanceof ServerResponse) {
-            if (response.exists) {
-                show_ok.classList.remove('hidden');
-                show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${response.status}`;
-            } else {
+            // hide all items
+            [item_domain, item_schema, item_fragment, item_path, item_port, item_queries, item_port, show_ok, show_error, show_warning].forEach(item => {
+                item.classList.add('hidden');
+            });
+
+            if (response instanceof ServerResponse) {
+                if (response.exists) {
+                    show_ok.classList.remove('hidden');
+                    show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${response.status}`;
+                } else {
+                    show_error.classList.remove('hidden');
+                    show_error.textContent = `Url "${url}" does not exists. Server returned code ${response.status}`;
+                }
+            } else if (response instanceof String) {
                 show_error.classList.remove('hidden');
-                show_error.textContent = `Url "${url}" does not exists. Server returned code ${response.status}`;
+                show_error.textContent = `Url "${url}" cannot be checked. Server error: ${response}`;
             }
-        } else if (response instanceof String) {
-            show_error.classList.remove('hidden');
-            show_error.textContent = `Url "${url}" cannot be checked. Server error: ${response}`;
-        }
-    });
+        })
+    }, 1000);
 
 
 }
@@ -178,6 +184,9 @@ async function checkIfUrlExists(url: String) {
 
 // Actual web call to url if this exists
 async function WebCallStatus(url: string): Promise<ServerResponse | String> {
+    // let's wait for 1s to simulate the server call
+    await new Promise(r => setTimeout(r, 700));
+
     let response = new ServerResponse;
     response.exists = true;
     response.status = 200;
