@@ -158,13 +158,17 @@ async function checkIfUrlExists(url: String) {
             item.classList.add('hidden');
         });
 
-
-        if (response.exists) {
-            show_ok.classList.remove('hidden');
-            show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${status}`;
-        } else {
+        if (response instanceof ServerResponse) {
+            if (response.exists) {
+                show_ok.classList.remove('hidden');
+                show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${response.status}`;
+            } else {
+                show_error.classList.remove('hidden');
+                show_error.textContent = `Url "${url}" does not exists. Server returned code ${response.status}`;
+            }
+        } else if (response instanceof String) {
             show_error.classList.remove('hidden');
-            show_error.textContent = `Url "${url}" does not exists. Server returned code ${status}`;
+            show_error.textContent = `Url "${url}" cannot be checked. Server error: ${response}`;
         }
     });
 
@@ -173,10 +177,25 @@ async function checkIfUrlExists(url: String) {
 
 
 // Actual web call to url if this exists
-async function WebCallStatus(url: string): Promise<ServerResponse> {
+async function WebCallStatus(url: string): Promise<ServerResponse | String> {
     let response = new ServerResponse;
     response.exists = true;
     response.status = 200;
     response.type = DestType.File;
     return response;
+
+    // Idea about implementation
+    // 
+    // setup a backend server with a post endpoint:
+    // {
+    //  "url": String
+    // }
+    // as it's post bosy
+    // that server should return  a json as in:
+    // enum Result {
+    //      Ok( ServerResponse ),
+    //      Err( String ),
+    // }
+    // if it's ok value send as server response,
+    // if error return the error message itself
 }
