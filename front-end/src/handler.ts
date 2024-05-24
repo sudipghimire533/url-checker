@@ -230,6 +230,10 @@ async function WebCallStatus(url: string): Promise<ServerResponse | String> {
     response.status = response.exists ? 200 : 404;
     // if it exists, select randomly to simulate file or folder
     // if not, return iunknown
+    // we can probably check if it is file or folder by checking it it has file name at the end:
+    // example: path/something.txt, path/something.php
+    // but won't always hold true depending on server,
+    // example: path/ looks like folder but might be a file referencing to path/index.php in apache server
     response.type = response.exists ? getRandomBool() ? DestType.File : DestType.Folder : DestType.Unknown;
     return response;
 
