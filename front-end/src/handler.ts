@@ -60,7 +60,7 @@ function onready() {
             if (urlIsValid) {
                 // set a timeout to throttle the server call
                 serverCallTimeout = setTimeout(async () => {
-                    await checkIfUrlExists(inputStr, serverCallTimeout);
+                    await checkIfUrlExists(inputStr);
                 }, 1000);
             }
         }
@@ -179,7 +179,7 @@ function urlInputChanged(inputStr: String): boolean {
 
         document.querySelectorAll(".program-area .item .icon").forEach(item => {
             if (item.classList.contains('error')) {
-               item.classList.remove('hidden');
+                item.classList.remove('hidden');
             } else {
                 item.classList.add('hidden');
             }
@@ -189,11 +189,11 @@ function urlInputChanged(inputStr: String): boolean {
     return result.isOk();
 }
 
-async function checkIfUrlExists(url: String, myTimeOutId: TimeOutIdT) {
+async function checkIfUrlExists(url: String) {
     WebCallStatus(url.trim()).then(response => {
         // do not perform anything in the case when
         // inputUrl have been changed
-        if ( serverCallTimeout != myTimeOutId ) {
+        if (url != urlInputBox.value) {
             return;
         }
 
