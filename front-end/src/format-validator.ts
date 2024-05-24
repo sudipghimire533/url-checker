@@ -143,6 +143,11 @@ function checkUrl(input: String): FormatResult {
                 return new FormatResult().setError(FormatError.InvalidDomainName, `Domain "${domain}" is not valid`);
             }
         }
+
+        if ( domains.length == 0 ) {
+            return new FormatResult().setError(FormatError.NoDomainName, `No domain name found`);
+        }
+
         // move last sub domain to tld and another to root
         okResult.tld = domains.pop() as string;
         okResult.rootDomain = domains.pop() as string;

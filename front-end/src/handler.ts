@@ -23,7 +23,9 @@ let showOk: HTMLElement;
 let urlInputBox: HTMLInputElement;
 
 // A timeout to enable throttle
-let serverCallTimeout: ReturnType<typeof setTimeout>;
+type TimeOutIdT = ReturnType<typeof setTimeout>;
+
+let serverCallTimeout: TimeOutIdT;
 
 function fillItems() {
     itemSchema = document.querySelector(".program-area li.item.schema")!;
@@ -58,7 +60,7 @@ function onready() {
             if (urlIsValid) {
                 // set a timeout to throttle the server call
                 serverCallTimeout = setTimeout(async () => {
-                    await checkIfUrlExists(inputStr);
+                    await checkIfUrlExists(inputStr, serverCallTimeout);
                 }, 1000);
             }
         }
@@ -126,13 +128,58 @@ function urlInputChanged(inputStr: String): boolean {
         showError.classList.remove('hidden');
         showError.textContent = `Url ${inputStr} is not valid. validation error: ${result.error[1]}`;
 
+
         [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment].forEach(e => {
             e.classList.add('hidden');
         });
 
+        let setError = function (item: HTMLElement) {
+            item.classList.remove('hidden');
+            item.querySelector('i.icon')?.classList.add('hidden');
+            item.querySelector('i.icon.error')?.classList.remove('hidden');
+        };
+        switch (result.error[0]) {
+            case FormatError.UnknownProtocol:
+                itemSchemaLabel.textContent = `Schema is invalid`;
+                setError(itemSchema);
+                break;
+            case FormatError.EmptyDomainName:
+                itemDomainLabel.textContent = `Domain is empty`;
+                setError(itemDomain);
+                break;
+            case FormatError.InvalidPort:
+                itemPortLabel.textContent = `Port is invalid`;
+                setError(itemPort);
+            case FormatError.InvalidPathChar:
+                itemPathLabel.textContent = `Path contains invalid character`;
+                setError(itemPath);
+                break;
+            case FormatError.InvalidFragment:
+                itemQueriesLabel.textContent = `Illegal fragment`;
+                setError(itemQueries);
+                break;
+            case FormatError.NoDomainName:
+                itemDomainLabel.textContent = `No domain name`;
+                setError(itemDomain);
+                break;
+            case FormatError.InvalidDomainName:
+                itemDomainLabel.textContent = `Invalid domain name`;
+                setError(itemDomain);
+                break;
+            case FormatError.InvalidCharInPath:
+                itemPathLabel.textContent = `Path contains invalid character`;
+                setError(itemPath);
+                break;
+            case FormatError.InvalidQuery:
+                itemQueriesLabel.textContent = `Invalid query`;
+                setError(itemQueries);
+                break;
+        }
+
+
         document.querySelectorAll(".program-area .item .icon").forEach(item => {
             if (item.classList.contains('error')) {
-                item.classList.remove('hidden');
+               item.classList.remove('hidden');
             } else {
                 item.classList.add('hidden');
             }
@@ -142,8 +189,14 @@ function urlInputChanged(inputStr: String): boolean {
     return result.isOk();
 }
 
-async function checkIfUrlExists(url: String) {
+async function checkIfUrlExists(url: String, myTimeOutId: TimeOutIdT) {
     WebCallStatus(url.trim()).then(response => {
+        // do not perform anything in the case when
+        // inputUrl have been changed
+        if ( serverCallTimeout != myTimeOutId ) {
+            return;
+        }
+
         // hide all items
         [showOk, showError, showWarning].forEach(item => {
             item.classList.add('hidden');
@@ -174,10 +227,10 @@ async function WebCallStatus(url: string): Promise<ServerResponse | String> {
     // this might exists or not exists. select randomly to simulate all case
     response.exists = getRandomBool();
     // if it exists, return 200 else 400
-    response.status = response.exists? 200 : 404;
+    response.status = response.exists ? 200 : 404;
     // if it exists, select randomly to simulate file or folder
     // if not, return iunknown
-    response.type = response.exists? getRandomBool()? DestType.File: DestType.Folder : DestType.Unknown;
+    response.type = response.exists ? getRandomBool() ? DestType.File : DestType.Folder : DestType.Unknown;
     return response;
 
     // Idea about implementation
