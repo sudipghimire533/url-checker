@@ -11,53 +11,53 @@ class ServerResponse {
     type: DestType = DestType.Unknown;
 }
 
-let item_schema: HTMLElement;
-let item_domain: HTMLElement;
-let item_port: HTMLElement;
-let item_path: HTMLElement;
-let item_queries: HTMLElement;
-let item_fragment: HTMLElement;
-let show_error: HTMLElement;
-let show_warning: HTMLElement;
-let show_ok: HTMLElement;
-let url_input_box: HTMLInputElement;
+let itemSchema: HTMLElement;
+let itemDomain: HTMLElement;
+let itemPort: HTMLElement;
+let itemPath: HTMLElement;
+let itemQueries: HTMLElement;
+let itemFragment: HTMLElement;
+let showError: HTMLElement;
+let showWarning: HTMLElement;
+let showOk: HTMLElement;
+let urlInputBox: HTMLInputElement;
 
 // A timeout to enable throttle
-let server_call_timeout: ReturnType<typeof setTimeout>;
+let serverCallTimeout: ReturnType<typeof setTimeout>;
 
-function fill_items() {
-    item_schema = document.querySelector(".program-area li.item.schema")!;
-    item_domain = document.querySelector(".program-area li.item.domain")!;
-    item_port = document.querySelector(".program-area li.item.port")!;
-    item_path = document.querySelector(".program-area li.item.path")!;
-    item_queries = document.querySelector(".program-area li.item.queries")!;
-    item_fragment = document.querySelector(".program-area li.item.fragment")!;
-    show_error = document.querySelector(".program-area li.show-error")!;
-    show_warning = document.querySelector(".program-area li.show-warning")!;
-    show_ok = document.querySelector(".program-area li.show-ok")!;
+function fillItems() {
+    itemSchema = document.querySelector(".program-area li.item.schema")!;
+    itemDomain = document.querySelector(".program-area li.item.domain")!;
+    itemPort = document.querySelector(".program-area li.item.port")!;
+    itemPath = document.querySelector(".program-area li.item.path")!;
+    itemQueries = document.querySelector(".program-area li.item.queries")!;
+    itemFragment = document.querySelector(".program-area li.item.fragment")!;
+    showError = document.querySelector(".program-area li.show-error")!;
+    showWarning = document.querySelector(".program-area li.show-warning")!;
+    showOk = document.querySelector(".program-area li.show-ok")!;
 }
 
 function onready() {
-    fill_items();
+    fillItems();
 
-    url_input_box = document.querySelector("#user-input-url")!;
+    urlInputBox = document.querySelector("#user-input-url")!;
 
     // register for validator in every input value change
-    url_input_box.addEventListener('input', async (e) => {
+    urlInputBox.addEventListener('input', async (e) => {
         if (e) {
             // clear any server call
             // that input is outdated already
-            server_call_timeout ? clearTimeout(server_call_timeout) : null;
+            serverCallTimeout ? clearTimeout(serverCallTimeout) : null;
 
             // validate the sementics of url
-            let inputStr = url_input_box.value;
+            let inputStr = urlInputBox.value;
             let urlIsValid = urlInputChanged(inputStr);
 
             // if sementics is valid,
             // check for it's existance and type
             if (urlIsValid) {
                 // set a timeout to throttle the server call
-                server_call_timeout = setTimeout(async () => {
+                serverCallTimeout = setTimeout(async () => {
                     await checkIfUrlExists(inputStr);
                 }, 1000);
             }
@@ -70,19 +70,19 @@ function urlInputChanged(inputStr: String): boolean {
     inputStr = inputStr.trim();
 
     // hide all information box
-    [show_ok, show_error, show_warning].forEach(e => {
+    [showOk, showError, showWarning].forEach(e => {
         e.classList.add('hidden');
     });
 
     // check the result from url validator
     let result = checkUrl(inputStr);
 
-    let item_schema_label = item_schema.querySelector('span.label')!;
-    let item_domain_label = item_domain.querySelector('span.label')!;
-    let item_port_label = item_port.querySelector('span.label')!;
-    let item_path_label = item_path.querySelector('span.label')!;
-    let item_queries_label = item_queries.querySelector('span.label')!;
-    let item_fragment_label = item_fragment.querySelector('span.label')!;
+    let itemSchemaLabel = itemSchema.querySelector('span.label')!;
+    let itemDomainLabel = itemDomain.querySelector('span.label')!;
+    let itemPortLabel = itemPort.querySelector('span.label')!;
+    let itemPathLabel = itemPath.querySelector('span.label')!;
+    let itemQueriesLabel = itemQueries.querySelector('span.label')!;
+    let itemFragmentLabel = itemFragment.querySelector('span.label')!;
 
     // reset all item
     document.querySelectorAll(".program-area .item .icon").forEach(item => {
@@ -96,37 +96,37 @@ function urlInputChanged(inputStr: String): boolean {
     // everything is ok
     if (result.isOk()) {
         let url = result.ok!;
-        item_schema_label.textContent = `Schema is valid: ${url.schema}`;
-        item_domain_label.textContent = `Domain is valid: subdomain: ${JSON.stringify(url.subdomains)}, root domain: ${url.rootDomain}, tld: ${url.tld}`;
-        item_port_label.textContent = `Port is valid: ${url.port}`;
-        item_path_label.textContent = `Path is valid: ${JSON.stringify(url.paths)}`;
-        item_queries_label.textContent = `Queries is valid: ${url.queries}`;
-        item_fragment_label.textContent = `Fragment is valid: ${url.fragment}`;
+        itemSchemaLabel.textContent = `Schema is valid: ${url.schema}`;
+        itemDomainLabel.textContent = `Domain is valid: subdomain: ${JSON.stringify(url.subdomains)}, root domain: ${url.rootDomain}, tld: ${url.tld}`;
+        itemPortLabel.textContent = `Port is valid: ${url.port}`;
+        itemPathLabel.textContent = `Path is valid: ${JSON.stringify(url.paths)}`;
+        itemQueriesLabel.textContent = `Queries is valid: ${url.queries}`;
+        itemFragmentLabel.textContent = `Fragment is valid: ${url.fragment}`;
 
         // enable 
-        [item_schema, item_domain, item_port, item_path, item_queries, item_fragment].forEach(e => {
+        [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment].forEach(e => {
             e.classList.remove('hidden');
             e.querySelector('i.icon')?.classList.add('hidden');
             e.querySelector('i.icon.ok')?.classList.remove('hidden');
         });
 
         // show the ok message
-        show_ok.classList.remove('hidden');
-        show_ok.textContent = `Url ${inputStr.trim()} is valid`.toString();
+        showOk.classList.remove('hidden');
+        showOk.textContent = `Url ${inputStr.trim()} is valid`.toString();
 
         // if it's a warning, display
         if (result.warning) {
-            show_warning.classList.remove('hidden');
-            show_warning.textContent = `Also check warning: ${result.warning}`;
+            showWarning.classList.remove('hidden');
+            showWarning.textContent = `Also check warning: ${result.warning}`;
         }
     }
 
     // is not ok and have error
     else if (result.error) {
-        show_error.classList.remove('hidden');
-        show_error.textContent = `Url ${inputStr} is not valid. validation error: ${result.error[1]}`;
+        showError.classList.remove('hidden');
+        showError.textContent = `Url ${inputStr} is not valid. validation error: ${result.error[1]}`;
 
-        [item_schema, item_domain, item_port, item_path, item_queries, item_fragment].forEach(e => {
+        [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment].forEach(e => {
             e.classList.add('hidden');
         });
 
@@ -145,21 +145,21 @@ function urlInputChanged(inputStr: String): boolean {
 async function checkIfUrlExists(url: String) {
     WebCallStatus(url.trim()).then(response => {
         // hide all items
-        [show_ok, show_error, show_warning].forEach(item => {
+        [showOk, showError, showWarning].forEach(item => {
             item.classList.add('hidden');
         });
 
         if (response instanceof ServerResponse) {
             if (response.exists) {
-                show_ok.classList.remove('hidden');
-                show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${response.status}`;
+                showOk.classList.remove('hidden');
+                showOk.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${response.status}`;
             } else {
-                show_error.classList.remove('hidden');
-                show_error.textContent = `Url "${url}" does not exists. Server returned code ${response.status}`;
+                showError.classList.remove('hidden');
+                showError.textContent = `Url "${url}" does not exists. Server returned code ${response.status}`;
             }
         } else if (response instanceof String) {
-            show_error.classList.remove('hidden');
-            show_error.textContent = `Url "${url}" cannot be checked. Server error: ${response}`;
+            showError.classList.remove('hidden');
+            showError.textContent = `Url "${url}" cannot be checked. Server error: ${response}`;
         }
     });
 }

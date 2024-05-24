@@ -49,8 +49,8 @@ class FormatResult {
     }
 
     // set warning string
-    setWarning(warning_str: String): FormatResult {
-        this.warning = warning_str;
+    setWarning(warningStr: String): FormatResult {
+        this.warning = warningStr;
         return this;
     }
 
@@ -89,52 +89,52 @@ function checkUrl(input: String): FormatResult {
     // or query is propery sanitised and there is no # character
     // https://localhost/some-path?query="Something-with-%23some" <-- ok
     {
-        let split_res = split_back_once(rest, "#");
-        rest = split_res[0];
-        let fragment = split_res[1];
+        let splitRes = splitBackOnce(rest, "#");
+        rest = splitRes[0];
+        let fragment = splitRes[1];
         okResult.fragment = fragment;
     }
 
     // protocol
     {
-        let split_res = split_once(rest, "://");
-        let protocol_str = split_res[0];
-        rest = split_res[1];
+        let splitRes = splitOnce(rest, "://");
+        let protocolStr = splitRes[0];
+        rest = splitRes[1];
 
-        let is_known_protocol = KNOWN_PROTOCOLS.includes(protocol_str as string);
-        if (is_known_protocol) {
-            okResult.schema = protocol_str;
+        let isKnownProtocol = KNOWN_PROTOCOLS.includes(protocolStr as string);
+        if (isKnownProtocol) {
+            okResult.schema = protocolStr;
         } else {
-            return new FormatResult().setError(FormatError.UnknownProtocol, `Protocol ${protocol_str} is not known`);
+            return new FormatResult().setError(FormatError.UnknownProtocol, `Protocol ${protocolStr} is not known`);
         }
     }
 
     // domains: sub-domain, root domain, tld and port
     {
-        let split_res = split_once(rest, "/");
-        let domain_with_port = split_res[0];
-        rest = split_res[1];
+        let splitRes = splitOnce(rest, "/");
+        let domainWithPort = splitRes[0];
+        rest = splitRes[1];
 
-        let port_split_res = split_once(domain_with_port, ":");
-        let domains_str = port_split_res[0];
-        let port = port_split_res[1];
+        let portSplitres = splitOnce(domainWithPort, ":");
+        let domainStr = portSplitres[0];
+        let port = portSplitres[1];
 
         // Port does not exists, hence everything is part of domain
         if (!port) {
-            domains_str = domain_with_port;
+            domainStr = domainWithPort;
         } else if (port.trim().length > 0) {
-            // Check if this port_str is valid number
-            let port_num = parseInt(port as string);
-            if (isNaN(port_num)) {
+            // Check if this portStr is valid number
+            let portNum = parseInt(port as string);
+            if (isNaN(portNum)) {
                 return new FormatResult().setError(FormatError.InvalidPort, `Port {port} is not a vald number value`);
             } else {
-                okResult.port = port_num;
+                okResult.port = portNum;
             }
         }
 
         // for each domain and subdomains,
         // check they are valid
-        let domains = domains_str.split(".");
+        let domains = domainStr.split(".");
         for (let i = 0; i < domains.length; i++) {
             let domain = domains[i];
 
@@ -153,19 +153,19 @@ function checkUrl(input: String): FormatResult {
     {
         // slug can be interepreted differently according to webserver.
         // so let's assume everything is valid
-        let split_res = split_back_once(rest, "?");
-        let path = split_res[0];
-        rest = split_res[1];
+        let splitRes = splitBackOnce(rest, "?");
+        let path = splitRes[0];
+        rest = splitRes[1];
 
         // we assume all paths are url encoded correctly
         // i.e contains no spaces or special character,
         // eg: ü is represented as %C3%BC
-        const allowed_chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%+-/.";
+        const allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%+-/.";
         let paths = path.split("/");
         paths.forEach(p => {
             for (let i = 0; i < p.length; i++) {
                 let c = p[i];
-                if (!allowed_chars.includes(c)) {
+                if (!allowedChars.includes(c)) {
                     return new FormatResult().setError(FormatError.InvalidPathChar, `Character "${c}" is not allowed in url path`);
                 }
             }
@@ -186,7 +186,7 @@ function checkUrl(input: String): FormatResult {
 }
 
 // split string only once on first encounter of seperator
-function split_once(input: String, separator: String): [String, String] {
+function splitOnce(input: String, separator: String): [String, String] {
     let splitAt = input.indexOf(separator as string);
     if (splitAt == -1 || splitAt == input.length) {
         return [input, ""];
@@ -197,7 +197,7 @@ function split_once(input: String, separator: String): [String, String] {
 }
 
 // split string only once on last encounter of seperator
-function split_back_once(input: String, separator: String): [String, String] {
+function splitBackOnce(input: String, separator: String): [String, String] {
     let splitAt = input.lastIndexOf(separator as string);
     if (splitAt == -1 || splitAt == input.length) {
         return [input, ""];
