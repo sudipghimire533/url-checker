@@ -4,38 +4,10 @@ Check for url sementic and it's existance
 [Goto Screenshots](#screenshots)
 
 # How to run
-## REQUIREMENTS:
-* Nodejs
-* Tailwind
-* Typescript
-* Tailwindcss
-
-## STEPS:
-From root directory:
-1) build tailwind
-```bash
-npx tailwindcss -i front-end/src/tailwind-input.css -o front-end/dist/tailwind.css
+Below command will copile the tailwind, compile the typescript, start a http-server and open the link for you.
+For reference, please refer to package.json file
 ```
-
-2) Compile Typescript
-```
-tsc --outDir front-end/dist/ front-end/src/*.ts
-```
-
-3) Start a local server
-* With Php:
-```
-php -S localhost:8000
-```
-
-* Or with python:
-```
-python3 -m http.server 
-```
-
-* Open in browser:
-```
-http://0.0.0.0:8000/front-end/src/index.html
+npm run demo
 ```
 
 ## Caviates

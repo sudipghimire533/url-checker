@@ -1,0 +1,29 @@
+{
+    "name": "url-checker",
+    "version": "0.2.0",
+    "author": "Sudip Ghimire <sudipghimire533@gmail.com>",
+    "description": "Check for url sementic and it's existance",
+    "main": "main.js",
+    "scripts": {
+        "build-tailwind": "tailwindcss -i front-end/src/tailwind-input.css -o front-end/dist/tailwind.css",
+        "build-ts": "tsc --outDir front-end/dist/ front-end/src/*.ts",
+        "build": "npm run build-tailwind && npm run build-ts",
+        "serve": "http-server",
+        "open": "open http://127.0.0.1:8080/front-end/src/index.html",
+        "demo": "npm run build && npm run open && npm run serve"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/sudipghimire533/url-checker.git"
+    },
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/sudipghimire533/url-checker/issues"
+    },
+    "homepage": "https://github.com/sudipghimire533/url-checker#readme",
+    "dependencies": {
+        "tailwindcss": "^3.4.3",
+        "typescript": "^5.4.5",
+        "http-server": "^14.1.1"
+    }
+}

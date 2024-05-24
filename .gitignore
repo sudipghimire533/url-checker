@@ -1,2 +1,5 @@
+node_modules
+package-lock.json
+
 front-end/dist/format-validator.js
 front-end/dist/handler.js
