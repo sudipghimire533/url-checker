@@ -171,9 +171,13 @@ async function WebCallStatus(url: string): Promise<ServerResponse | String> {
     await new Promise(r => setTimeout(r, 700));
 
     let response = new ServerResponse;
-    response.exists = true;
-    response.status = 200;
-    response.type = DestType.File;
+    // this might exists or not exists. select randomly to simulate all case
+    response.exists = getRandomBool();
+    // if it exists, return 200 else 400
+    response.status = response.exists? 200 : 404;
+    // if it exists, select randomly to simulate file or folder
+    // if not, return iunknown
+    response.type = response.exists? getRandomBool()? DestType.File: DestType.Folder : DestType.Unknown;
     return response;
 
     // Idea about implementation
@@ -190,4 +194,8 @@ async function WebCallStatus(url: string): Promise<ServerResponse | String> {
     // }
     // if it's ok value send as server response,
     // if error return the error message itself
+}
+
+function getRandomBool(): boolean {
+    return Math.random() > 0.5;
 }
