@@ -48,8 +48,8 @@ function onready() {
     url_input_box.addEventListener('input', async (e) => {
         if (e) {
             let inputStr = url_input_box.value;
-            urlInputChanged(inputStr);
-            if (!check_url_btn.classList.contains('inactive')) {
+            let urlIsValid = urlInputChanged(inputStr);
+            if (urlIsValid) {
                 await checkIfUrlExists(inputStr);
             }
         }
@@ -59,16 +59,17 @@ function onready() {
     check_url_btn.addEventListener('click', async (e) => {
         if (e) {
             let inputStr = url_input_box.value;
-            urlInputChanged(inputStr);
+            let urlIsValid = urlInputChanged(inputStr);
 
-            if (!check_url_btn.classList.contains('inactive')) {
+            if (urlIsValid) {
                 await checkIfUrlExists(inputStr);
             }
         }
     })
 }
 
-function urlInputChanged(inputStr: String) {
+// takes input url and return if the url is valid or not
+function urlInputChanged(inputStr: String): boolean {
     inputStr = inputStr.trim();
 
     // hide all information box
@@ -147,6 +148,8 @@ function urlInputChanged(inputStr: String) {
             }
         });
     }
+
+    return result.isOk();
 }
 
 async function checkIfUrlExists(url: String) {
