@@ -21,7 +21,6 @@ let show_error: HTMLElement;
 let show_warning: HTMLElement;
 let show_ok: HTMLElement;
 let url_input_box: HTMLInputElement;
-let check_url_btn: HTMLElement;
 
 // A timeout to enable throttle
 let server_call_timeout: ReturnType<typeof setTimeout>;
@@ -42,30 +41,28 @@ function onready() {
     fill_items();
 
     url_input_box = document.querySelector("#user-input-url")!;
-    check_url_btn = document.querySelector("#check-existance-btn")!;
 
     // register for validator in every input value change
     url_input_box.addEventListener('input', async (e) => {
         if (e) {
+            // clear any server call
+            // that input is outdated already
+            server_call_timeout ? clearTimeout(server_call_timeout) : null;
+
+            // validate the sementics of url
             let inputStr = url_input_box.value;
             let urlIsValid = urlInputChanged(inputStr);
+
+            // if sementics is valid,
+            // check for it's existance and type
             if (urlIsValid) {
-                await checkIfUrlExists(inputStr);
+                // set a timeout to throttle the server call
+                server_call_timeout = setTimeout(async () => {
+                    await checkIfUrlExists(inputStr);
+                }, 1000);
             }
         }
     });
-
-    // register for check existence button click
-    check_url_btn.addEventListener('click', async (e) => {
-        if (e) {
-            let inputStr = url_input_box.value;
-            let urlIsValid = urlInputChanged(inputStr);
-
-            if (urlIsValid) {
-                await checkIfUrlExists(inputStr);
-            }
-        }
-    })
 }
 
 // takes input url and return if the url is valid or not
@@ -76,10 +73,6 @@ function urlInputChanged(inputStr: String): boolean {
     [show_ok, show_error, show_warning].forEach(e => {
         e.classList.add('hidden');
     });
-
-    // also disable the button
-    // only enable if active
-    check_url_btn.classList.add('inactive');
 
     // check the result from url validator
     let result = checkUrl(inputStr);
@@ -109,9 +102,6 @@ function urlInputChanged(inputStr: String): boolean {
         item_path_label.textContent = `Path is valid: ${JSON.stringify(url.paths)}`;
         item_queries_label.textContent = `Queries is valid: ${url.queries}`;
         item_fragment_label.textContent = `Fragment is valid: ${url.fragment}`;
-
-        // enable submit button
-        check_url_btn.classList.remove('inactive');
 
         // enable 
         [item_schema, item_domain, item_port, item_path, item_queries, item_fragment].forEach(e => {
@@ -153,37 +143,25 @@ function urlInputChanged(inputStr: String): boolean {
 }
 
 async function checkIfUrlExists(url: String) {
-    // while we make server call,
-    // let's lock the input
+    WebCallStatus(url.trim()).then(response => {
+        // hide all items
+        [show_ok, show_error, show_warning].forEach(item => {
+            item.classList.add('hidden');
+        });
 
-    if (server_call_timeout ) {
-        clearTimeout(server_call_timeout);
-    }
-
-    server_call_timeout = setTimeout(async () => {
-        WebCallStatus(url.trim()).then(response => {
-
-            // hide all items
-            [show_ok, show_error, show_warning].forEach(item => {
-                item.classList.add('hidden');
-            });
-
-            if (response instanceof ServerResponse) {
-                if (response.exists) {
-                    show_ok.classList.remove('hidden');
-                    show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${response.status}`;
-                } else {
-                    show_error.classList.remove('hidden');
-                    show_error.textContent = `Url "${url}" does not exists. Server returned code ${response.status}`;
-                }
-            } else if (response instanceof String) {
+        if (response instanceof ServerResponse) {
+            if (response.exists) {
+                show_ok.classList.remove('hidden');
+                show_ok.textContent = `Url "${url}" exists as ${response.type} type. Server returned code ${response.status}`;
+            } else {
                 show_error.classList.remove('hidden');
-                show_error.textContent = `Url "${url}" cannot be checked. Server error: ${response}`;
+                show_error.textContent = `Url "${url}" does not exists. Server returned code ${response.status}`;
             }
-        })
-    }, 1000);
-
-
+        } else if (response instanceof String) {
+            show_error.classList.remove('hidden');
+            show_error.textContent = `Url "${url}" cannot be checked. Server error: ${response}`;
+        }
+    });
 }
 
 
