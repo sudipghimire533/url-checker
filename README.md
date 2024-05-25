@@ -28,7 +28,7 @@ update the ui to show result
 7) seperate from lat # to get fragment if any
 8) seperate by ? to seperate paths and queries ( if any )
 9) seperate path by / to get individual path and check if all path have valid character
-10) if all passes, return schema ( step 1), auth(step 3) port ( step 4), (sub/root)domains ( step 5), path ( step 8 ), queries ( step 7), fragment ( step 6 )
+10) if all passes, return schema ( step 1), auth(step 3) port ( step 4), (sub/root)domains ( step 5), path ( step 8 ), queries ( step 8), fragment ( step 7 )
 11) if error occurs at any point in above steps, early return with error information
 
 ## Assumtion made
