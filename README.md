@@ -1,8 +1,6 @@
 # Url existance checker
 Check for url sementic and it's existance
 
-[Goto Screenshots](#screenshots)
-
 # How to run
 Below command will copile the tailwind, compile the typescript, start a http-server and open the link for you.
 For reference, please refer to package.json file
@@ -33,12 +31,15 @@ update the ui to show result
 10) if all passes, return schema ( step 1), auth(step 3) port ( step 4), (sub/root)domains ( step 5), path ( step 8 ), queries ( step 7), fragment ( step 6 )
 11) if error occurs at any point in above steps, early return with error information
 
+## Assumtion made
+* Only http://, https://, file://, and ftp:// schema are valid
+* Url may or may not contain port
+* url may or may not contain auth details
+* url may or may not contain path ( or any info other than domain )
+* if path is present it's always expected to be url encoded
+* url may or may not contain fragment
+* everything after last # is treated as fragment hence, in query at least # is expected to be url encoded even if it is quoted
+
 ## Caviates
 I assume main intent of this assignment is to see how I perform and thing through purpose.
 There are many things assumed to be (not) true for simplicity purpose. If you would like to discuss anything in specific in further more details, I am open to take questions.
-
-# Screenshots
-![demo-auth](./res/demo-auth.png)
-![demo-one](./res/demo-one.png)
-![demo-two](./res/demo-two.png)
-![demo-three](./res/demo-3.png)

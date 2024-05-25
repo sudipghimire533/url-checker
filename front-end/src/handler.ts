@@ -45,6 +45,7 @@ function onready() {
     fillItems();
 
     urlInputBox = document.querySelector("#user-input-url")!;
+    urlInputChanged("");
 
     // register for validator in every input value change
     urlInputBox.addEventListener('input', async (e) => {
@@ -55,6 +56,7 @@ function onready() {
 
             // validate the sementics of url
             let inputStr = urlInputBox.value;
+
             let urlIsValid = urlInputChanged(inputStr);
 
             // if sementics is valid,
@@ -78,9 +80,6 @@ function urlInputChanged(inputStr: String): boolean {
         e.classList.add('hidden');
     });
 
-    // check the result from url validator
-    let result = checkUrl(inputStr);
-
     let itemSchemaLabel = itemSchema.querySelector('span.label')!;
     let itemDomainLabel = itemDomain.querySelector('span.label')!;
     let itemPortLabel = itemPort.querySelector('span.label')!;
@@ -88,6 +87,29 @@ function urlInputChanged(inputStr: String): boolean {
     let itemQueriesLabel = itemQueries.querySelector('span.label')!;
     let itemFragmentLabel = itemFragment.querySelector('span.label')!;
     let itemAuthLabel = itemAuth.querySelector('span.label')!;
+
+    if (inputStr.length == 0) {
+        itemSchemaLabel.textContent = "Schema is empty";
+        itemDomainLabel.textContent = "Domain is empty";
+        itemAuthLabel.textContent = "Auth is empty";
+        itemPortLabel.textContent = "Port is empty";
+        itemPathLabel.textContent = "Path is valid";
+        itemQueriesLabel.textContent = "Queries is valid";
+        itemFragmentLabel.textContent = "Fragment is valid";
+
+        // disable
+        [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment, itemAuth].forEach(e => {
+            e.classList.remove('hidden');
+            e.querySelectorAll('i.icon').forEach(e => e.classList.add('hidden'));
+            e.querySelector('i.icon.warning')?.classList.remove('hidden');
+        });
+
+        // mark this as not valid
+        return false;
+    }
+
+    // check the result from url validator
+    let result = checkUrl(inputStr);
 
     // reset all item
     document.querySelectorAll(".program-area .item .icon").forEach(item => {
@@ -101,20 +123,42 @@ function urlInputChanged(inputStr: String): boolean {
     // everything is ok
     if (result.isOk()) {
         let url = result.ok!;
-        itemSchemaLabel.textContent = `Schema is valid: ${url.schema}`;
-        itemDomainLabel.textContent = `Domain is valid: subdomain: ${JSON.stringify(url.subdomains)}, root domain: ${url.rootDomain}, tld: ${url.tld}`;
-        itemAuthLabel.textContent = `Auth is valid: ${url.auth}`;
-        itemPortLabel.textContent = `Port is valid: ${url.port}`;
-        itemPathLabel.textContent = `Path is valid: ${JSON.stringify(url.paths)}`;
-        itemQueriesLabel.textContent = `Queries is valid: ${url.queries}`;
-        itemFragmentLabel.textContent = `Fragment is valid: ${url.fragment}`;
 
         // enable 
         [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment, itemAuth].forEach(e => {
             e.classList.remove('hidden');
-            e.querySelector('i.icon')?.classList.add('hidden');
-            e.querySelector('i.icon.ok')?.classList.remove('hidden');
+            e.querySelectorAll('i.icon').forEach(e => e.classList.add('hidden'));
         });
+        let setItem = function (item: HTMLElement, content: string, type: string) {
+            item.querySelector('i.icon.' + type)?.classList.remove('hidden');
+            item.querySelector('span.label')!.textContent = content;
+        };
+
+        setItem(
+            itemSchema,
+            `Schema is valid: ${url.schema}`,
+            'ok'
+        );
+        setItem(
+            itemDomain,
+            `Domain is valid: subdomain: ${JSON.stringify(url.subdomains)}, root domain: ${url.rootDomain}, tld: ${url.tld}`, 
+            'ok'
+        );
+        url.auth ?
+            setItem(itemAuth, `Auth is valid: ${url.auth}`, 'ok')
+            :setItem(itemAuth, `Auth is empty`, 'warning');
+        url.port ?
+            setItem(itemPort, `Port is valid: ${url.port}`, 'ok')
+            :setItem(itemPort, `Port is empty`, 'warning');
+        url.paths.length > 0 ?
+            setItem(itemPath, `Path is valid: ${JSON.stringify(url.paths)}`, 'ok')
+            :setItem(itemPath, `Path is empty`, 'warning');
+        url.queries ?
+            setItem(itemQueries, `Queries is valid: ${url.queries}`, 'ok')
+            :setItem(itemQueries, `Queries is empty`, 'warning');
+        url.fragment ?
+            setItem(itemFragment, `Fragment is valid: ${url.fragment}`, 'ok'):
+            setItem(itemFragment, `Fragment is empty`, 'warning');
 
         // show the ok message
         showOk.classList.remove('hidden');
