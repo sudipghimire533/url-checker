@@ -133,6 +133,7 @@ function urlInputChanged(inputStr: String): boolean {
             e.classList.add('hidden');
         });
 
+        // show error message
         let setError = function (item: HTMLElement) {
             item.classList.remove('hidden');
             item.querySelector('i.icon')?.classList.add('hidden');

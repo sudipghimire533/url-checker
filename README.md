@@ -6,7 +6,8 @@ Check for url sementic and it's existance
 # How to run
 Below command will copile the tailwind, compile the typescript, start a http-server and open the link for you.
 For reference, please refer to package.json file
-```
+```sh
+npm install
 npm run demo
 ```
 
