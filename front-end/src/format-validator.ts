@@ -37,28 +37,14 @@ class FormatOk {
 class FormatResult {
     result: FormatOk | [FormatError, string];
     // any warning if contains
-    warning?: String;
+    warning?: string;
 
     constructor(res: FormatOk | [FormatError, string]) {
         this.result = res;
     }
 
-    // set error object
-    setError(error: FormatError, context: string): FormatResult {
-        this.result = [error, context];
-        return this;
-    }
-
-    // set ok object
-    setOk(ok: FormatOk): FormatResult {
-        this.result = ok;
-        return this;
-    }
-
-    // set error string
-
     // set warning string
-    setWarning(warningStr: String): FormatResult {
+    setWarning(warningStr: string): FormatResult {
         this.warning = warningStr;
         return this;
     }
@@ -82,7 +68,7 @@ class FormatResult {
     }
 
     // Check if this result if ok ( without error and without warning )
-    isStrictlyOk(): FormatOk | null {
+    isStrictlyOk(): FormatOk | string {
         let ok = this.Ok();
         if (ok && !this.warning) {
             return this.Ok();
