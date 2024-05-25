@@ -68,7 +68,7 @@ class FormatResult {
     }
 
     // Check if this result if ok ( without error and without warning )
-    isStrictlyOk(): FormatOk | string {
+    isStrictlyOk(): FormatOk | null {
         let ok = this.Ok();
         if (ok && !this.warning) {
             return this.Ok();
