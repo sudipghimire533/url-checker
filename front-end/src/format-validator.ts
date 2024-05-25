@@ -14,6 +14,7 @@ enum FormatError {
     InvalidFragment = "InvalidFragment",
     InvalidQuery = "InvalidQuery",
     InvalidPathChar = "InvalidPathChar",
+    UnknownError = "UnknownError",
 }
 
 // Ok type for FormatResult
@@ -34,18 +35,27 @@ class FormatOk {
 
 // Result returned once format of url had been checked against
 class FormatResult {
-    // any ok value
-    ok?: FormatOk;
-    // any error if contains
-    error?: [FormatError, String];
+    result: FormatOk | [FormatError, string];
     // any warning if contains
     warning?: String;
 
+    constructor(res: FormatOk | [FormatError, string]) {
+        this.result = res;
+    }
+
     // set error object
-    setError(error: FormatError, context: String): FormatResult {
-        this.error = [error, context];
+    setError(error: FormatError, context: string): FormatResult {
+        this.result = [error, context];
         return this;
     }
+
+    // set ok object
+    setOk(ok: FormatOk): FormatResult {
+        this.result = ok;
+        return this;
+    }
+
+    // set error string
 
     // set warning string
     setWarning(warningStr: String): FormatResult {
@@ -54,13 +64,31 @@ class FormatResult {
     }
 
     // check if this result is ok ( without error )
-    isOk(): boolean {
-        return !this.error;
+    Ok(): FormatOk | null {
+        if (this.result instanceof FormatOk) {
+            return this.result;
+        } else {
+            return null;
+        }
+    }
+
+    // check if this result is error
+    Err(): [FormatError, string] | null {
+        if (!this.Ok()) {
+            return this.result as [FormatError, string];
+        } else {
+            return null;
+        }
     }
 
     // Check if this result if ok ( without error and without warning )
-    isStrictlyOk(): boolean {
-        return this.isOk() && !this.warning;
+    isStrictlyOk(): FormatOk | null {
+        let ok = this.Ok();
+        if (ok && !this.warning) {
+            return this.Ok();
+        } else {
+            return null;
+        }
     }
 }
 
@@ -81,7 +109,7 @@ function checkUrl(input: String): FormatResult {
         if (isKnownProtocol) {
             okResult.schema = protocolStr;
         } else {
-            return new FormatResult().setError(FormatError.UnknownProtocol, `Protocol ${protocolStr} is not known`);
+            return new FormatResult([FormatError.UnknownProtocol, `Protocol ${protocolStr} is not known`]);
         }
     }
 
@@ -94,7 +122,7 @@ function checkUrl(input: String): FormatResult {
         splitRes = splitOnce(domainWithPortAndAuth, "@");
         let auth = splitRes[0];
         let domainWithPort = splitRes[1];
-        if ( domainWithPort.length > 0 ) {
+        if (domainWithPort.length > 0) {
             okResult.auth = auth;
         } else {
             domainWithPort = splitRes[0];
@@ -111,7 +139,7 @@ function checkUrl(input: String): FormatResult {
             // Check if this portStr is valid number
             let portNum = parseInt(port as string);
             if (isNaN(portNum)) {
-                return new FormatResult().setError(FormatError.InvalidPort, `Port {port} is not a vald number value`);
+                return new FormatResult([FormatError.InvalidPort, `Port {port} is not a vald number value`]);
             } else {
                 okResult.port = portNum;
             }
@@ -125,12 +153,12 @@ function checkUrl(input: String): FormatResult {
 
             // domain should be a valid identifier
             if (!isValidDomainIdent(domain)) {
-                return new FormatResult().setError(FormatError.InvalidDomainName, `Domain "${domain}" is not valid`);
+                return new FormatResult([FormatError.InvalidDomainName, `Domain "${domain}" is not valid`]);
             }
         }
 
-        if ( domains.length == 0 ) {
-            return new FormatResult().setError(FormatError.NoDomainName, `No domain name found`);
+        if (domains.length == 0) {
+            return new FormatResult([FormatError.NoDomainName, `No domain name found`]);
         }
 
         // move last sub domain to tld and another to root
@@ -178,7 +206,7 @@ function checkUrl(input: String): FormatResult {
             for (let i = 0; i < p.length; i++) {
                 let c = p[i];
                 if (!allowedChars.includes(c)) {
-                    return new FormatResult().setError(FormatError.InvalidPathChar, `Character "${c}" is not allowed in url path`);
+                    return new FormatResult([FormatError.InvalidPathChar, `Character "${c}" is not allowed in url path`]);
                 }
             }
             okResult.paths.push(p);
@@ -192,9 +220,7 @@ function checkUrl(input: String): FormatResult {
     }
 
 
-    let result = new FormatResult;
-    result.ok = okResult;
-    return result;
+    return new FormatResult(okResult);
 }
 
 // split string only once on first encounter of seperator

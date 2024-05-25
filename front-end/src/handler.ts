@@ -121,9 +121,8 @@ function urlInputChanged(inputStr: String): boolean {
     });
 
     // everything is ok
-    if (result.isOk()) {
-        let url = result.ok!;
-
+    let url = result.Ok();
+    if (url) {
         // enable 
         [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment, itemAuth].forEach(e => {
             e.classList.remove('hidden');
@@ -141,23 +140,23 @@ function urlInputChanged(inputStr: String): boolean {
         );
         setItem(
             itemDomain,
-            `Domain is valid: subdomain: ${JSON.stringify(url.subdomains)}, root domain: ${url.rootDomain}, tld: ${url.tld}`, 
+            `Domain is valid: subdomain: ${JSON.stringify(url.subdomains)}, root domain: ${url.rootDomain}, tld: ${url.tld}`,
             'ok'
         );
         url.auth ?
             setItem(itemAuth, `Auth is valid: ${url.auth}`, 'ok')
-            :setItem(itemAuth, `Auth is empty`, 'warning');
+            : setItem(itemAuth, `Auth is empty`, 'warning');
         url.port ?
             setItem(itemPort, `Port is valid: ${url.port}`, 'ok')
-            :setItem(itemPort, `Port is empty`, 'warning');
+            : setItem(itemPort, `Port is empty`, 'warning');
         url.paths.length > 0 ?
             setItem(itemPath, `Path is valid: ${JSON.stringify(url.paths)}`, 'ok')
-            :setItem(itemPath, `Path is empty`, 'warning');
+            : setItem(itemPath, `Path is empty`, 'warning');
         url.queries ?
             setItem(itemQueries, `Queries is valid: ${url.queries}`, 'ok')
-            :setItem(itemQueries, `Queries is empty`, 'warning');
+            : setItem(itemQueries, `Queries is empty`, 'warning');
         url.fragment ?
-            setItem(itemFragment, `Fragment is valid: ${url.fragment}`, 'ok'):
+            setItem(itemFragment, `Fragment is valid: ${url.fragment}`, 'ok') :
             setItem(itemFragment, `Fragment is empty`, 'warning');
 
         // show the ok message
@@ -169,12 +168,16 @@ function urlInputChanged(inputStr: String): boolean {
             showWarning.classList.remove('hidden');
             showWarning.textContent = `Also check warning: ${result.warning}`;
         }
+
+        return true;
     }
 
     // is not ok and have error
-    else if (result.error) {
+    else {
+        let error = result.Err()!;
+
         showError.classList.remove('hidden');
-        showError.textContent = `Url ${inputStr} is not valid. validation error: ${result.error[1]}`;
+        showError.textContent = `Url ${inputStr} is not valid. validation error: ${error[1]}`;
 
 
         [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment, itemAuth].forEach(e => {
@@ -187,7 +190,7 @@ function urlInputChanged(inputStr: String): boolean {
             item.querySelector('i.icon')?.classList.add('hidden');
             item.querySelector('i.icon.error')?.classList.remove('hidden');
         };
-        switch (result.error[0]) {
+        switch (error[0]) {
             case FormatError.UnknownProtocol:
                 itemSchemaLabel.textContent = `Schema is invalid`;
                 setError(itemSchema);
@@ -233,9 +236,9 @@ function urlInputChanged(inputStr: String): boolean {
                 item.classList.add('hidden');
             }
         });
-    }
 
-    return result.isOk();
+        return false;
+    }
 }
 
 async function checkIfUrlExists(url: String) {
