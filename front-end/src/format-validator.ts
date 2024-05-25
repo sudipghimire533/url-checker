@@ -72,29 +72,6 @@ function checkUrl(input: String): FormatResult {
     let rest = input;
     let okResult = new FormatOk();
 
-
-
-    // Seperate fragment from last
-    // example: #end, #bottom, #some-name
-    // We expect all the url even the query value to be url encoded
-    // queries can be complex with quotation and everything,
-    // we can do checks but it required more complex parsing
-    // for now assume everything is valid'
-    // TODO:
-    // http://localhost/some-path?query="Something-with-#some" <-- eror
-    // in above case, this might split the #some part though that is not expected
-    // this case is not handled here for simplicity purpose
-    // This do works however is there is an actual fragment <-- ok
-    // https://localhost/some-path?query="Something-with-#some"#frag
-    // or query is propery sanitised and there is no # character
-    // https://localhost/some-path?query="Something-with-%23some" <-- ok
-    {
-        let splitRes = splitBackOnce(rest, "#");
-        rest = splitRes[0];
-        let fragment = splitRes[1];
-        okResult.fragment = fragment;
-    }
-
     // protocol
     {
         let splitRes = splitOnce(rest, "://");
@@ -154,6 +131,27 @@ function checkUrl(input: String): FormatResult {
         okResult.subdomains = domains;
     }
 
+    // Seperate fragment from last
+    // example: #end, #bottom, #some-name
+    // We expect all the url even the query value to be url encoded
+    // queries can be complex with quotation and everything,
+    // we can do checks but it required more complex parsing
+    // for now assume everything is valid'
+    // TODO:
+    // http://localhost/some-path?query="Something-with-#some" <-- eror
+    // in above case, this might split the #some part though that is not expected
+    // this case is not handled here for simplicity purpose
+    // This do works however is there is an actual fragment <-- ok
+    // https://localhost/some-path?query="Something-with-#some"#frag
+    // or query is propery sanitised and there is no # character
+    // https://localhost/some-path?query="Something-with-%23some" <-- ok
+    {
+        let splitRes = splitBackOnce(rest, "#");
+        rest = splitRes[0];
+        let fragment = splitRes[1];
+        okResult.fragment = fragment;
+    }
+
     // check url slugs
     {
         // slug can be interepreted differently according to webserver.
@@ -167,7 +165,8 @@ function checkUrl(input: String): FormatResult {
         // eg: ü is represented as %C3%BC
         const allowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789%+-/.";
         let paths = path.split("/");
-        paths.forEach(p => {
+        for (let i = 0; i < paths.length; i++) {
+            let p = paths[i];
             for (let i = 0; i < p.length; i++) {
                 let c = p[i];
                 if (!allowedChars.includes(c)) {
@@ -175,7 +174,7 @@ function checkUrl(input: String): FormatResult {
                 }
             }
             okResult.paths.push(p);
-        })
+        };
     }
 
     // check for queries. eg: ?q=something&text=%20some%20
