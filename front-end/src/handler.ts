@@ -13,6 +13,7 @@ class ServerResponse {
 
 let itemSchema: HTMLElement;
 let itemDomain: HTMLElement;
+let itemAuth: HTMLElement;
 let itemPort: HTMLElement;
 let itemPath: HTMLElement;
 let itemQueries: HTMLElement;
@@ -30,6 +31,7 @@ let serverCallTimeout: TimeOutIdT;
 function fillItems() {
     itemSchema = document.querySelector(".program-area li.item.schema")!;
     itemDomain = document.querySelector(".program-area li.item.domain")!;
+    itemAuth = document.querySelector(".program-area li.item.auth")!;
     itemPort = document.querySelector(".program-area li.item.port")!;
     itemPath = document.querySelector(".program-area li.item.path")!;
     itemQueries = document.querySelector(".program-area li.item.queries")!;
@@ -85,6 +87,7 @@ function urlInputChanged(inputStr: String): boolean {
     let itemPathLabel = itemPath.querySelector('span.label')!;
     let itemQueriesLabel = itemQueries.querySelector('span.label')!;
     let itemFragmentLabel = itemFragment.querySelector('span.label')!;
+    let itemAuthLabel = itemAuth.querySelector('span.label')!;
 
     // reset all item
     document.querySelectorAll(".program-area .item .icon").forEach(item => {
@@ -100,13 +103,14 @@ function urlInputChanged(inputStr: String): boolean {
         let url = result.ok!;
         itemSchemaLabel.textContent = `Schema is valid: ${url.schema}`;
         itemDomainLabel.textContent = `Domain is valid: subdomain: ${JSON.stringify(url.subdomains)}, root domain: ${url.rootDomain}, tld: ${url.tld}`;
+        itemAuthLabel.textContent = `Auth is valid: ${url.auth}`;
         itemPortLabel.textContent = `Port is valid: ${url.port}`;
         itemPathLabel.textContent = `Path is valid: ${JSON.stringify(url.paths)}`;
         itemQueriesLabel.textContent = `Queries is valid: ${url.queries}`;
         itemFragmentLabel.textContent = `Fragment is valid: ${url.fragment}`;
 
         // enable 
-        [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment].forEach(e => {
+        [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment, itemAuth].forEach(e => {
             e.classList.remove('hidden');
             e.querySelector('i.icon')?.classList.add('hidden');
             e.querySelector('i.icon.ok')?.classList.remove('hidden');
@@ -129,7 +133,7 @@ function urlInputChanged(inputStr: String): boolean {
         showError.textContent = `Url ${inputStr} is not valid. validation error: ${result.error[1]}`;
 
 
-        [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment].forEach(e => {
+        [itemSchema, itemDomain, itemPort, itemPath, itemQueries, itemFragment, itemAuth].forEach(e => {
             e.classList.add('hidden');
         });
 

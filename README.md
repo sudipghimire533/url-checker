@@ -22,21 +22,23 @@ update the ui to show result
 
 ### Url validation can be broken down to:
 1) seperate anything before :// and check if it is known url
-2) seperate until next '/' or end to get the domains and port info
-3) seperate domain_ports string by : to get domain and port
-4) seperate domain by . to get sub-domaind, tld, and root domain
-4) From step 3, rest of the string is treated as slug, query and fragment
-5) seperate from lat # to get fragment if any
-6) seperate by ? to seperate paths and queries ( if any )
-7) seperate path by / to get individual path and check if all path have valid character
-8) if all passes, return schema ( step 1), port ( step 3), (sub/root)domains ( step 4), path ( step 7 ), queries ( step 6), fragment ( step 5 )
-9) if error occurs at any point in above steps, early return with error information
+2) seperate until next '/' or end to get the domains, auth and port info
+3) Seperate by @ to get any auth string if present
+4) seperate remaining string by : to get domain and port
+5) seperate domain by . to get sub-domaind, tld, and root domain
+6) From step 3, rest of the string is treated as slug, query and fragment
+7) seperate from lat # to get fragment if any
+8) seperate by ? to seperate paths and queries ( if any )
+9) seperate path by / to get individual path and check if all path have valid character
+10) if all passes, return schema ( step 1), auth(step 3) port ( step 4), (sub/root)domains ( step 5), path ( step 8 ), queries ( step 7), fragment ( step 6 )
+11) if error occurs at any point in above steps, early return with error information
 
 ## Caviates
 I assume main intent of this assignment is to see how I perform and thing through purpose.
 There are many things assumed to be (not) true for simplicity purpose. If you would like to discuss anything in specific in further more details, I am open to take questions.
 
 # Screenshots
+![demo-auth](./res/demo-auth.png)
 ![demo-one](./res/demo-one.png)
 ![demo-two](./res/demo-two.png)
 ![demo-three](./res/demo-3.png)

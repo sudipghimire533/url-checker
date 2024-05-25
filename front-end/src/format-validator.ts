@@ -24,8 +24,7 @@ class FormatOk {
     subdomains: String[] = [];
     rootDomain: String = "";
     tld: String = "";
-    // todo:
-    // better to make it Vec<String>
+    auth?: String;
     paths: String[] = [];
     // todo: better to make it HashMap<String, Option<String>>
     queries?: String;
@@ -86,11 +85,20 @@ function checkUrl(input: String): FormatResult {
         }
     }
 
-    // domains: sub-domain, root domain, tld and port
+    // domains: sub-domain, root domain, auth, tld and port
     {
         let splitRes = splitOnce(rest, "/");
-        let domainWithPort = splitRes[0];
+        let domainWithPortAndAuth = splitRes[0];
         rest = splitRes[1];
+
+        splitRes = splitOnce(domainWithPortAndAuth, "@");
+        let auth = splitRes[0];
+        let domainWithPort = splitRes[1];
+        if ( domainWithPort.length > 0 ) {
+            okResult.auth = auth;
+        } else {
+            domainWithPort = splitRes[0];
+        }
 
         let portSplitres = splitOnce(domainWithPort, ":");
         let domainStr = portSplitres[0];
